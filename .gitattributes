@@ -1,0 +1,13 @@
+# 统一换行符，避免 Windows / macOS 之间的 CRLF 抖动
+* text=auto eol=lf
+
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.md text eol=lf
+*.js text eol=lf
+*.mjs text eol=lf
+
+# 目录快照是生成物：折叠 diff、不计入语言统计
+data/catalog.json linguist-generated=true
+data/summary.json linguist-generated=true

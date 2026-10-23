@@ -1,6 +1,6 @@
 {
   "name": "dsh-watermelon-ui",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "给 DeepSeek Harness 增加 Watermelon UI 能力：内置 watermelon-ui 技能（技术栈门禁 + 安装命令 + 署名要求），附带离线目录索引与两个模型工具（watermelon_catalog_search / watermelon_install_plan），并提供官方托管 MCP 的可选接入。 / Watermelon UI for DeepSeek Harness: a bundled skill with stack gating and install recipes, an offline catalog index, two model tools, and an optional hosted MCP connection.",
   "type": "module",
@@ -27,6 +27,11 @@
   ],
   "engines": {
     "node": "^22.19.0 || >=24.0.0"
+  },
+  "scripts": {
+    "test": "node scripts/verify.mjs",
+    "verify": "node scripts/verify.mjs",
+    "snapshot": "node scripts/snapshot.mjs"
   },
   "dsh": {
     "bundle": {

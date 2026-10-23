@@ -1,5 +1,7 @@
 # dsh-watermelon-ui
 
+简体中文 | [English](README.en.md)
+
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 把 [Watermelon UI](https://ui.watermelon.sh) 接进 DeepSeek Harness：一个内置技能 + 两个离线目录工具，外加官方托管 MCP 的可选接入。安装后 agent 会先判断「这个项目到底适不适合用 Watermelon」，再给出准确的 shadcn 安装命令，而不是凭记忆编 slug。
@@ -44,10 +46,21 @@ git clone https://github.com/Eunsolfs/dsh-watermelon-ui.git
 ## 本地校验（安装前）
 
 ```bash
-node scripts/verify.mjs
+npm test        # 等价 node scripts/verify.mjs
 ```
 
-不联网、不安装，检查：JSON/快照字段、工具 SchemaSpec 方言、两个工具的真实执行与输出契约、Markdown 渲染、技能 frontmatter、patch 形状。全部打印 `ALL CHECKS PASSED` 才算可安装。
+不联网、不安装，检查：JSON/快照字段、工具 SchemaSpec 方言、两个工具的真实执行与输出契约、Markdown 渲染、技能 frontmatter、patch 形状。全部打印 `ALL CHECKS PASSED` 才算可安装。CI（GitHub Actions）在 Node 22 / 24 上跑同一套检查。
+
+## 刷新目录快照
+
+Watermelon 上游随时会加条目，`data/catalog.json` 是某一时刻的快照（日期见 `fetchedAt`）。要更新：
+
+```bash
+npm run snapshot            # 抓取并写入 data/
+npm run snapshot -- --dry-run   # 只看统计，不写文件
+```
+
+脚本只读公开 API、免鉴权。上游限制是 `limit≤50`、无 offset、`summary` 不返回分类，所以它**沿用 `data/summary.json` 里的分类清单做枚举线索**，再补上首页新出现的分类；最后与 summary 计数核对，**不一致就退出码 1 且不写盘**，避免把残缺快照提交上去。刷新后请重跑 `npm test`。
 
 ## 配置
 
@@ -66,6 +79,8 @@ cordis.patch.yml       bundle patch：本插件行 + 可选的 MCP 行
 icon.svg / locale/     显示元数据（中英文）与原创图标
 skills/watermelon-ui/  内置技能正文（SKILL.md）
 data/catalog.json      离线目录快照（849 条，无源码）
+scripts/verify.mjs     安装前自检（离线）
+scripts/snapshot.mjs   重新生成目录快照（联网，只读公开 API）
 lib/plugin/            宿主适配：apply、技能注册、SchemaSpec 方言守卫
 lib/tools/             两个模型工具
 lib/search/            检索打分与中英词表
