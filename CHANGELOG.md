@@ -9,6 +9,7 @@
 - GitHub Actions `verify` 工作流：Node 22 / 24，安装前静态 + 运行时自检。
 - `README.en.md`（英文说明）与中文 README 的语言切换。
 - `.gitattributes`：统一 LF；把 `data/*.json` 标记为生成物。
+- `lib/repo/catalog.js` 改为按文件 mtime 缓存：跑完 `npm run snapshot` 覆盖快照后，下一次工具调用自动读到新数据，不需要重启 Harness。
 
 ### 修复
 
