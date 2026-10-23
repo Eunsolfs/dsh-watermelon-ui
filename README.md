@@ -1,5 +1,7 @@
 # dsh-watermelon-ui
 
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 把 [Watermelon UI](https://ui.watermelon.sh) 接进 DeepSeek Harness：一个内置技能 + 两个离线目录工具，外加官方托管 MCP 的可选接入。安装后 agent 会先判断「这个项目到底适不适合用 Watermelon」，再给出准确的 shadcn 安装命令，而不是凭记忆编 slug。
 
 ## 能力
@@ -15,18 +17,29 @@
 
 ## 安装
 
-在 Harness 里用 `plugin_manager`：
-
-```json
-{ "action": "install_bundle", "target": "C:\\...\\watermelon-ui-plugin" }
+```bash
+git clone https://github.com/Eunsolfs/dsh-watermelon-ui.git
 ```
-安装后立即生效：新会话能看到 `watermelon_ui` 技能与两个工具。`watermelon-mcp` 行默认 `disabled: true`，需要语义检索/源码时启用它：
+
+然后在 Harness 里用 `plugin_manager`，把 `target` 指向克隆下来的目录：
 
 ```json
-{ "action": "set_plugin", "target": "watermelon-mcp", "enabled": true }
+{ "action": "install_bundle", "target": "C:\\path\\to\\dsh-watermelon-ui" }
+```
+
+安装后立即生效：新会话能看到 `watermelon-ui` 技能与两个工具。`watermelon-mcp` 行默认 `disabled: true`，需要语义检索/源码时启用它（注意 entryId 是 `include:watermelon-mcp`，不是 `watermelon-mcp`）：
+
+```json
+{ "action": "set_plugin", "target": "include:watermelon-mcp", "enabled": true }
 ```
 
 启用代价：启动时多一次网络握手（网络不通会等到 SDK 超时），模型工具表里多 8 个 `mcp__watermelon__*` 工具。不需要就保持关闭——本地工具已经能给出安装命令。
+
+回滚：
+
+```json
+{ "action": "remove_bundle", "target": "dsh-watermelon-ui" }
+```
 
 ## 本地校验（安装前）
 

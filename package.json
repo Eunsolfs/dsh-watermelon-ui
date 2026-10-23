@@ -38,6 +38,14 @@
     "@deepseek-ai/dsh-skill": ">=0.1.0-rc.1 <0.2.0-0 || >=0.1.1-rc.1 <0.2.0-0 || >=0.2.0-rc.1 <0.3.0-0 || >=0.2.1-rc.1 <0.3.0-0",
     "@deepseek-ai/dsh-tools": ">=0.1.0-rc.1 <0.2.0-0 || >=0.1.1-rc.1 <0.2.0-0 || >=0.2.0-rc.1 <0.3.0-0 || >=0.2.1-rc.1 <0.3.0-0"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Eunsolfs/dsh-watermelon-ui.git"
+  },
+  "homepage": "https://github.com/Eunsolfs/dsh-watermelon-ui#readme",
+  "bugs": {
+    "url": "https://github.com/Eunsolfs/dsh-watermelon-ui/issues"
+  },
   "keywords": [
     "dsh-plugin",
     "deepseek-harness",
