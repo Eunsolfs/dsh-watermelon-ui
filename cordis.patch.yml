@@ -1,0 +1,28 @@
+# dsh-watermelon-ui bundle
+#
+# 两行插件的分工（都由本 bundle 提供，安装后即生效/即待启用）：
+#   1. watermelon-ui  —— 本插件：注册内置 watermelon-ui 技能 + 两个离线目录工具
+#                        （watermelon_catalog_search / watermelon_install_plan）。
+#                        只依赖 @deepseek-ai/dsh-base 已挂载的 tools / skills 缝。
+#   2. watermelon-mcp —— 官方托管 MCP（https://mcp.watermelon.sh/mcp，Streamable HTTP、
+#                        只读、无需 API Key）。默认 disabled：它是"可选增强"，开启后
+#                        才在模型工具表里增加 mcp__watermelon__* 系列工具，同时也意味着
+#                        每次启动多一次网络握手（网络不通时会等到 SDK 默认超时）。
+#                        需要时用 plugin_manager set_plugin 启用，或把 disabled 改成 false。
+#
+# 注意：插入行的 config 一旦被覆盖层匹配就会整体替换，改这里时请保留全部字段。
+- insert:
+    - id: watermelon-ui
+      name: dsh-watermelon-ui
+      config:
+        defaultResults: 5
+        skill: true
+    - id: watermelon-mcp
+      name: '@deepseek-ai/dsh-mcp-client'
+      disabled: true
+      config:
+        serverName: watermelon
+        transport: streamable-http
+        url: https://mcp.watermelon.sh/mcp
+        toolCallTimeoutMs: 30000
+        failOnStartupError: false

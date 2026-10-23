@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="title">
+  <title id="title">Watermelon UI</title>
+  <!-- 原创图标：半个西瓜切片，瓜籽排成组件网格 -->
+  <path d="M4 43a28 28 0 0 1 56 0Z" fill="#1E7A4C"/>
+  <path d="M7.6 43a24.4 24.4 0 0 1 48.8 0Z" fill="#EAF7EE"/>
+  <path d="M10.8 43a21.2 21.2 0 0 1 42.4 0Z" fill="#FF4E63"/>
+  <path d="M4 43h56" stroke="#14603B" stroke-width="3" stroke-linecap="round"/>
+  <g fill="#2A1418">
+    <rect x="21.4" y="27.8" width="3.6" height="3.6" rx="1" transform="rotate(24 23.2 29.6)"/>
+    <rect x="30.2" y="25.4" width="3.6" height="3.6" rx="1" transform="rotate(24 32 27.2)"/>
+    <rect x="39" y="28.4" width="3.6" height="3.6" rx="1" transform="rotate(24 40.8 30.2)"/>
+    <rect x="24.8" y="35.2" width="3.6" height="3.6" rx="1" transform="rotate(24 26.6 37)"/>
+    <rect x="33.6" y="33.4" width="3.6" height="3.6" rx="1" transform="rotate(24 35.4 35.2)"/>
+    <rect x="42.4" y="35.6" width="3.6" height="3.6" rx="1" transform="rotate(24 44.2 37.4)"/>
+  </g>
+  <path d="M15 50.5c9.5 3.2 24.5 3.2 34 0" fill="none" stroke="#14603B" stroke-width="2.6" stroke-linecap="round" opacity="0.55"/>
+</svg>

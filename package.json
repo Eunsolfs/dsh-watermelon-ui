@@ -1,0 +1,52 @@
+{
+  "name": "dsh-watermelon-ui",
+  "version": "0.1.0",
+  "private": true,
+  "description": "给 DeepSeek Harness 增加 Watermelon UI 能力：内置 watermelon-ui 技能（技术栈门禁 + 安装命令 + 署名要求），附带离线目录索引与两个模型工具（watermelon_catalog_search / watermelon_install_plan），并提供官方托管 MCP 的可选接入。 / Watermelon UI for DeepSeek Harness: a bundled skill with stack gating and install recipes, an offline catalog index, two model tools, and an optional hosted MCP connection.",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "lib",
+    "data",
+    "skills",
+    "scripts",
+    "locale/*.json",
+    "icon.svg",
+    "cordis.patch.yml",
+    "package.json",
+    "README.md",
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "engines": {
+    "node": "^22.19.0 || >=24.0.0"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "*",
+    "@deepseek-ai/dsh-skill": ">=0.1.0-rc.1 <0.2.0-0 || >=0.1.1-rc.1 <0.2.0-0 || >=0.2.0-rc.1 <0.3.0-0 || >=0.2.1-rc.1 <0.3.0-0",
+    "@deepseek-ai/dsh-tools": ">=0.1.0-rc.1 <0.2.0-0 || >=0.1.1-rc.1 <0.2.0-0 || >=0.2.0-rc.1 <0.3.0-0 || >=0.2.1-rc.1 <0.3.0-0"
+  },
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "watermelon-ui",
+    "shadcn",
+    "tailwind",
+    "react",
+    "ui-catalog",
+    "mcp"
+  ],
+  "license": "MIT"
+}

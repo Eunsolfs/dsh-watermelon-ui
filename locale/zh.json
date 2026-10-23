@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Watermelon UI 组件目录",
+    "description": "告诉 agent 什么时候该用 Watermelon UI，并提供一个离线目录（849 个 React 组件、动画组件、区块、仪表盘与模板）和两个能生成准确 shadcn 安装命令的工具；官方托管 MCP 接入随包附带，可按需启用。"
+  }
+}
