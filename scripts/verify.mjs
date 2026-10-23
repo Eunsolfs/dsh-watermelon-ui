@@ -40,6 +40,40 @@ check(!badEntry, `快照存在缺字段条目: ${JSON.stringify(badEntry)?.slice
 const previewOnly = catalog.entries.filter(entry => !entry.installCommand && !entry.registryUrl)
 notes.push(`snapshot ${catalog.fetchedAt}: ${catalog.entries.length} entries / preview-only ${previewOnly.length}`)
 
+// 2b) 快照一致性：计数、去重、安装命令自洽、排序稳定
+const KINDS = ['components', 'animated-components', 'blocks', 'dashboards', 'templates']
+check(catalog.totalEntries === catalog.entries.length, `totalEntries=${catalog.totalEntries} 与实际 ${catalog.entries.length} 条不一致`)
+check(Object.keys(catalog.counts ?? {}).length === KINDS.length, 'catalog.counts 应包含 5 种 kind')
+for (const kind of KINDS) {
+  const actual = catalog.entries.filter(entry => entry.kind === kind).length
+  check(catalog.counts?.[kind] === actual, `${kind} 计数不一致：counts=${catalog.counts?.[kind]}，实际=${actual}`)
+}
+const identity = catalog.entries.map(entry => `${entry.kind}/${entry.slug}`)
+const duplicateCount = identity.length - new Set(identity).size
+check(duplicateCount === 0, `快照存在 ${duplicateCount} 条重复条目`)
+const badCommand = catalog.entries.find(entry =>
+  entry.installCommand && !entry.installCommand.endsWith(`/r/${entry.slug}.json`))
+check(!badCommand, `安装命令与 slug 不对应: ${badCommand?.slug} -> ${badCommand?.installCommand}`)
+const kindOrder = new Map(KINDS.map((kind, index) => [kind, index]))
+const unsorted = catalog.entries.findIndex((entry, index) => {
+  if (index === 0) return false
+  const previous = catalog.entries[index - 1]
+  const kindDelta = kindOrder.get(previous.kind) - kindOrder.get(entry.kind)
+  if (kindDelta !== 0) return kindDelta > 0
+  const categoryDelta = String(previous.category ?? '').localeCompare(String(entry.category ?? ''))
+  if (categoryDelta !== 0) return categoryDelta > 0
+  return previous.slug.localeCompare(entry.slug) > 0
+})
+check(unsorted === -1, `快照未按 kind→category→slug 排序，首个乱序位置: ${unsorted}`)
+
+const summaryFile = JSON.parse(read('data/summary.json'))
+check(summaryFile.totalEntries === catalog.totalEntries, 'summary.json totalEntries 与 catalog 不一致')
+check(summaryFile.fetchedAt === catalog.fetchedAt, 'summary.json fetchedAt 与 catalog 不一致')
+check(JSON.stringify(summaryFile.counts) === JSON.stringify(catalog.counts), 'summary.json counts 与 catalog 不一致')
+const summaryTotal = (summaryFile.categories ?? []).reduce((sum, item) => sum + item.count, 0)
+check(summaryTotal === catalog.entries.length, `summary.json 分类计数合计 ${summaryTotal} 与条目数 ${catalog.entries.length} 不一致`)
+notes.push(`summary categories: ${summaryFile.categories?.length ?? 0} 个，合计 ${summaryTotal} 条`)
+
 // 3) 工具定义与执行
 const { toolSpecs } = await import(new URL('lib/tools/index.js', ROOT))
 const { toolSchemaViolations, validateSpecValue } = await import(new URL('lib/plugin/schema.js', ROOT))

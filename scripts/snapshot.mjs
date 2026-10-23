@@ -82,12 +82,39 @@ function countBy(entries, key) {
   return out
 }
 
-function normalizeEntry(raw, kind) {
+const REGISTRY_ITEM = /^https:\/\/registry\.watermelon\.sh\/r\/[a-z0-9-]+\.json$/
+const INSTALL_PREFIX = 'npx shadcn@latest add '
+const registryItemUrl = slug => `https://registry.watermelon.sh/r/${slug}.json`
+
+/**
+ * 规范化一条 catalog 条目。
+ *
+ * 上游偶尔会写坏字段（实测 `card-15` 的 installCommand 是 "npx shadcn@latest add Card"），
+ * 这类命令直接发出去会装不上。凡是「声明了可安装但命令不合法」的条目，按 registry
+ * 的固定命名规则 `r/<slug>.json` 修正；**两者都没有的条目保持“仅预览”**，不凭空造命令。
+ */
+function normalizeEntry(raw, kind, repairs) {
   const entry = { kind, slug: raw.slug, title: raw.title, description: raw.description ?? '' }
   if (raw.category) entry.category = raw.category
+
+  const registryUrl = typeof raw.registryUrl === 'string' && REGISTRY_ITEM.test(raw.registryUrl)
+    ? raw.registryUrl
+    : undefined
+  const rawCommand = typeof raw.installCommand === 'string' ? raw.installCommand.trim() : ''
+  const validCommand = rawCommand.startsWith(INSTALL_PREFIX) && REGISTRY_ITEM.test(rawCommand.slice(INSTALL_PREFIX.length))
+    ? rawCommand
+    : undefined
+
+  if (!validCommand && rawCommand) repairs.push(`${kind}/${raw.slug}：「${rawCommand}」`)
+  // 只要上游“声明了可安装”（给了命令或 registry 地址）就按固定规则修正；
+  // 两者都没有的条目保持“仅预览”，不凭空造命令。
+  const installable = Boolean(validCommand || registryUrl || rawCommand)
+  if (installable) {
+    entry.installCommand = validCommand ?? `${INSTALL_PREFIX}${registryUrl ?? registryItemUrl(raw.slug)}`
+    entry.registryUrl = registryUrl ?? registryItemUrl(raw.slug)
+  }
+
   if (raw.previewUrl) entry.previewUrl = raw.previewUrl
-  if (raw.registryUrl) entry.registryUrl = raw.registryUrl
-  if (raw.installCommand) entry.installCommand = raw.installCommand
   if (Array.isArray(raw.dependencies) && raw.dependencies.length > 0) entry.dependencies = raw.dependencies
   return entry
 }
@@ -121,7 +148,7 @@ async function readCategoryHints() {
  * 抓取一个 kind 的全部条目。
  * @returns {Promise<{entries: object[], incomplete: string[]}>}
  */
-async function collectKind(kind, hints, failures) {
+async function collectKind(kind, hints, failures, repairs) {
   const entries = new Map()
   const categories = new Set(hints)
   const incomplete = []
@@ -158,7 +185,7 @@ async function collectKind(kind, hints, failures) {
     }
     for (const raw of rows) {
       if (!raw?.slug) continue
-      if (!entries.has(raw.slug)) entries.set(raw.slug, normalizeEntry(raw, kind))
+      if (!entries.has(raw.slug)) entries.set(raw.slug, normalizeEntry(raw, kind, repairs))
       if (raw.category && !categories.has(raw.category)) categories.add(raw.category)
     }
   }
@@ -175,11 +202,12 @@ async function main() {
   const hints = await readCategoryHints()
   const failures = []
   const incomplete = []
+  const repairs = []
   const byKind = new Map()
   const categoryIndex = new Map()
 
   for (const kind of KINDS) {
-    const { entries, incomplete: partial, categories } = await collectKind(kind, hints.get(kind) ?? new Set(), failures)
+    const { entries, incomplete: partial, categories } = await collectKind(kind, hints.get(kind) ?? new Set(), failures, repairs)
     byKind.set(kind, entries)
     categoryIndex.set(kind, [...categories].sort())
     incomplete.push(...partial)
@@ -202,7 +230,8 @@ async function main() {
 
   console.log('\n—— 结果 ——')
   console.log(`条目：${entries.length}（summary 声明 ${summary.totalEntries}）`)
-  console.log(`缺字段：${invalid.length}｜重复：${duplicates}｜失败分页：${failures.length}｜超单页被截断：${incomplete.length}`)
+  console.log(`缺字段：${invalid.length}｜重复：${duplicates}｜失败分页：${failures.length}｜超单页被截断：${incomplete.length}｜修正命令：${repairs.length}`)
+  for (const repair of repairs.slice(0, 10)) console.log(`  ~ ${repair} → 按 r/<slug>.json 规则修正`)
 
   if (mismatched.length > 0) console.log(`与 summary 不一致的类型：${mismatched.join(', ')}（可能是上游新增了分类，或某分类超过 ${PAGE_LIMIT} 条）`)
   for (const failure of failures.slice(0, 10)) console.error(`  ✗ ${failure}`)

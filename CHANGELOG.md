@@ -12,7 +12,9 @@
 
 ### 修复
 
+- 上游有两条条目的安装命令是坏的：`card-15` 写成 `npx shadcn@latest add Card`，`command-search` 少了 `/r/` 段。快照生成时按 registry 固定规则 `r/<slug>.json` 修正（两者实测 registry 都存在），而不是把坏命令原样发给模型。
 - 多词检索（如「定价 卡片」）原先只按字段权重排序，结果会被数量占优的单概念条目淹没（94 个 Card 压掉全部 pricing 区块）。`watermelon_catalog_search` 改为**先按命中词数、再按字段权重**排序。
+- `scripts/verify.mjs` 增加快照一致性检查：各 kind 计数、重复条目、安装命令与 slug 是否对应、是否按 kind→category→slug 稳定排序、`summary.json` 与 `catalog.json` 是否自洽。
 
 ### 变更
 
